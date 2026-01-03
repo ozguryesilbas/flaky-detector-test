@@ -1,0 +1,16 @@
+name: Flaky Test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [ $((RANDOM % 2)) -eq 0 ]; then
+            echo "Failing"
+            exit 1
+          else
+            echo "Passing"
+          fi
+      - uses: ozguryesilbas/flaky-detector@v1
