@@ -6,47 +6,31 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Restore flaky cache
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
           path: .flaky-cache
           key: flaky-${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
           restore-keys: |
             flaky-${{ github.workflow }}-${{ github.ref }}
 
-      - name: Show cache contents (before)
-        run: |
-          echo "== Cache before run =="
-          ls -la .flaky-cache || echo "No cache directory"
-          cat .flaky-cache/history.json || echo "No history file"
-
-      - name: Mostly pass, sometimes fail
-        run: |
+      - run: |
           R=$((RANDOM % 10))
-          echo "Random value: $R"
+          echo "Random: $R"
           if [ "$R" -lt 2 ]; then
-            echo "Failing (20%)"
             exit 1
-          else
-            echo "Passing (80%)"
           fi
 
-      - name: Flaky Detector
-        if: always()
+      - if: always()
         uses: ozguryesilbas/flaky-detector@v1
 
-      - name: Show cache contents (after)
-        if: always()
+      - if: always()
         run: |
-          echo "== Cache after run =="
-          ls -la .flaky-cache || echo "No cache directory"
-          cat .flaky-cache/history.json || echo "No history file"
+          ls -la .flaky-cache || true
+          cat .flaky-cache/history.json || true
 
-      - name: Save flaky cache
-        if: always()
+      - if: always()
         uses: actions/cache@v4
         with:
           path: .flaky-cache
