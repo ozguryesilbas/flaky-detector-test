@@ -6,16 +6,24 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/cache@v4
+      - name: Restore flaky cache
+        uses: actions/cache@v4
         with:
           path: .flaky-cache
           key: flaky-${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
           restore-keys: |
             flaky-${{ github.workflow }}-${{ github.ref }}
 
+      - name: Show cache contents (before)
+        run: |
+          echo "== Cache before run =="
+          ls -la .flaky-cache || echo "No cache directory"
+          cat .flaky-cache/history.json || echo "No history file"
+
       - name: Mostly pass, sometimes fail
         run: |
           R=$((RANDOM % 10))
+          echo "Random value: $R"
           if [ "$R" -lt 2 ]; then
             echo "Failing (20%)"
             exit 1
@@ -27,8 +35,16 @@ jobs:
         if: always()
         uses: ozguryesilbas/flaky-detector@v1
 
-      - uses: actions/cache@v4
+      - name: Show cache contents (after)
         if: always()
+        run: |
+          echo "== Cache after run =="
+          ls -la .flaky-cache || echo "No cache directory"
+          cat .flaky-cache/history.json || echo "No history file"
+
+      - name: Save flaky cache
+        if: always()
+        uses: actions/cache@v4
         with:
           path: .flaky-cache
           key: flaky-${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
