@@ -6,6 +6,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/cache@v4
+        with:
+          path: .flaky-cache
+          key: flaky-${{ github.workflow }}-${{ github.ref }}
+
       - name: Mostly pass, sometimes fail
         run: |
           R=$((RANDOM % 10))
@@ -19,3 +24,9 @@ jobs:
       - name: Flaky Detector
         if: always()
         uses: ozguryesilbas/flaky-detector@v1
+
+      - uses: actions/cache@v4
+        if: always()
+        with:
+          path: .flaky-cache
+          key: flaky-${{ github.workflow }}-${{ github.ref }}
