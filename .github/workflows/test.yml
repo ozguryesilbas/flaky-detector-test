@@ -6,11 +6,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          if [ $((RANDOM % 2)) -eq 0 ]; then
-            echo "Failing"
+      - name: Mostly pass, sometimes fail
+        run: |
+          R=$((RANDOM % 10))
+          if [ "$R" -lt 2 ]; then
+            echo "Failing (20%)"
             exit 1
           else
-            echo "Passing"
+            echo "Passing (80%)"
           fi
-      - uses: ozguryesilbas/flaky-detector@v1
+
+      - name: Flaky Detector
+        if: always()
+        uses: ozguryesilbas/flaky-detector@v1
