@@ -6,32 +6,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/cache@v4
-        with:
-          path: .flaky-cache
-          key: flaky-${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
-          restore-keys: |
-            flaky-${{ github.workflow }}-${{ github.ref }}
-
       - run: |
           R=$((RANDOM % 10))
-          echo "Random: $R"
           if [ "$R" -lt 2 ]; then
             exit 1
           fi
-
-      - if: always()
-        uses: ozguryesilbas/flaky-detector@v1
-
-      - if: always()
-        run: |
-          ls -la .flaky-cache || true
-          cat .flaky-cache/history.json || true
-
-      - if: always()
-        uses: actions/cache@v4
-        with:
-          path: .flaky-cache
-          key: flaky-${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
