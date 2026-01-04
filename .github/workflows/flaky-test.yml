@@ -1,0 +1,17 @@
+name: Flaky Test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 50/50 pass fail
+        run: |
+          R=$((RANDOM % 2))
+          if [ "$R" -eq 0 ]; then
+            echo "Fail"
+            exit 1
+          else
+            echo "Pass"
+          fi
