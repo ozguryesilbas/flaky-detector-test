@@ -1,0 +1,15 @@
+name: Flaky Analyzer
+
+on:
+  workflow_run:
+    workflows: ["Flaky Test"]
+    types: [completed]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ozguryesilbas/flaky-detector@v1
+        with:
+          token: ${{ github.token }}
+          window: "20"
